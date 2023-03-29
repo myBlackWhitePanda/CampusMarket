@@ -1,4 +1,4 @@
-package com.campus_macket.campus_market_backend.controller;
+package com.campus_macket.campus_market_backend.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
