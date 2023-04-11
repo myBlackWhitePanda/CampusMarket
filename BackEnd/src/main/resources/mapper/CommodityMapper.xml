@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.backend.mapper.CommodityMapper">
+
+    <!-- 配置 查询结果的列名和实体类的属性名的对应关系 -->
+    <resultMap id="CommodityResult" type="com.backend.bean.CommodityBean">
+        <!-- 主键字段的对应 -->
+        <id property="ID" column="ID"/>
+        <!--非主键字段的对应-->
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="tag" column="tag"/>
+        <result property="img" column="img"/>
+        <result property="description" column="description"/>
+        <result property="isSell" column="isSell"/>
+        <result property="create_time" column="create_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+
+    <!-- 只会查询近一个月的数据 -->
+    <select id="findCommodity" resultMap="CommodityResult">
+        SELECT
+            name, tag, img, description, isSell, create_time, remark
+        FROM
+            commodity
+        WHERE
+            name = #{name} AND isSell = 0 AND DATE_SUB (CURDATE (), INTERVAL 7 DAY) &lt;= date (create_time)
+        UNION DISTINCT
+        SELECT
+            name, tag, img, description, isSell, create_time, remark
+        FROM
+            commodity
+        WHERE
+            tag = (
+                SELECT DISTINCT tag
+                FROM commodity
+                WHERE name = #{name}
+            )
+        AND isSell = 0
+        AND DATE_SUB (CURDATE (), INTERVAL 7 DAY) &lt;= date (create_time)
+        ORDER BY name
+        LIMIT #{offset}, 20
+    </select>
+
+    <!-- 通过名字查询商品 -->
+    <select id="findCommodityByName" resultMap="CommodityResult">
+        SELECT * FROM commodity
+        WHERE name = #{name}
+          AND isSell = 0 AND DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= date(create_time)
+        ORDER BY name
+        LIMIT #{offset}, 20
+    </select>
+
+    <!-- 通过标签查询商品 -->
+    <select id="findCommodityByTag" resultMap="CommodityResult">
+        SELECT * FROM commodity
+        WHERE tag = #{tag}
+          AND isSell = 0 AND DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= date(create_time)
+        LIMIT #{offset}, 20
+    </select>
+
+</mapper>
